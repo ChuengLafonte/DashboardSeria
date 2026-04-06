@@ -131,23 +131,30 @@ body.dark-mode .pic-item { border-color: var(--border); }
 .text-warn { color: var(--warn) !important; }
 
 /* === FORMS === */
-.form-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+.form-grid { display: grid; grid-template-columns: 1fr; gap: 28px 24px; }
 @media(min-width: 768px) { .form-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }  .fg-full { grid-column: span 4; } .fg-half { grid-column: span 2; } }
 @media(min-width: 1400px) { .form-grid { grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; } .fg-full { grid-column: span 6; } .fg-half { grid-column: span 3; } }
-.fg { display: flex; flex-direction: column; gap: 8px; }
-.flabel { font-size: 12px; font-weight: 700; color: var(--text-dim); }
-.finput, .fselect { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-input); padding: 14px 16px; color: var(--text); font-family: var(--font); font-size: 15px; outline: none; width: 100%; transition: all 0.2s; }
-.finput:focus, .fselect:focus { border-color: var(--blue); background: var(--surface); box-shadow: 0 0 0 4px var(--blue-bg); }
-.finput[readonly] { background: var(--surface3); color: var(--text-dim); cursor: not-allowed; border-color: transparent; }
+.fg { display: flex; flex-direction: column; gap: 10px; }
+.flabel { font-size: 13px; font-weight: 700; color: var(--text-dim); letter-spacing: 0.3px; display: flex; align-items: center; gap: 4px; }
+.finput, .fselect { background: var(--surface2); border: 2px solid transparent; border-radius: 12px; padding: 16px 18px; color: var(--text); font-family: var(--font); font-size: 15px; outline: none; width: 100%; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 4px rgba(0,0,0,0.02) inset; }
+.finput:hover, .fselect:hover { background: var(--surface); border-color: var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.finput:focus, .fselect:focus { border-color: var(--blue); background: var(--surface); box-shadow: 0 0 0 4px var(--blue-bg), 0 4px 12px rgba(0,0,0,0.05); transform: translateY(-1px); }
+.finput[readonly] { background: var(--surface3); color: var(--text-dim); cursor: not-allowed; border-color: transparent; opacity: 0.8; box-shadow: none; }
+.finput[readonly]:hover { background: var(--surface3); border-color: transparent; box-shadow: none; transform: none; }
+
+/* Form Header Title */
+.form-section-title { font-size: 14px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 2px solid var(--blue-bg); padding-bottom: 12px; margin-bottom: 8px; margin-top: 12px; display: flex; align-items: center; gap: 8px; }
 
 /* === BUTTONS & OTHERS === */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border: none; border-radius: var(--r-input); font-family: var(--font); font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-.btn:active { transform: scale(.97); }
-.btn-primary { background: var(--blue); color: #fff; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2); }
-.btn-primary:hover { background: #2563EB; }
-.btn-success { background: var(--success); color: #fff; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);}
-.btn-success:hover { background: #059669; }
-.btn-full { width: 100%; padding: 18px; font-size: 16px; border-radius: 12px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 10px 20px; border: none; border-radius: 12px; font-family: var(--font); font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+.btn:active { transform: scale(.96); }
+.btn-primary { background: linear-gradient(135deg, #3B82F6, #2563EB); color: #fff; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3); }
+.btn-primary:hover { box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4); transform: translateY(-2px); }
+.btn-primary::after { content: ''; position: absolute; inset: 0; background: linear-gradient(rgba(255,255,255,0.2), transparent); opacity: 0; transition: opacity 0.3s; }
+.btn-primary:hover::after { opacity: 1; }
+.btn-success { background: linear-gradient(135deg, #10B981, #059669); color: #fff; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);}
+.btn-success:hover { box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4); transform: translateY(-2px); }
+.btn-full { width: 100%; padding: 20px; font-size: 16px; border-radius: 16px; letter-spacing: 0.5px; }
 .btn-ghost { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
 .btn-ghost:hover { background: var(--surface3); }
 
@@ -291,7 +298,7 @@ body.dark-mode .pic-item { border-color: var(--border); }
           
           <div class="card">
             <div class="card-header">
-              <div class="card-title" id="titleBulanIni">Top PIC (Bulan Ini)</div>
+              <div class="card-title" id="titleBulanIni">Top Donatur (Bulan Ini)</div>
             </div>
             <div class="card-body" style="padding: 20px;">
               <div id="topPicMonthlyContainer" class="pic-list">
@@ -302,7 +309,7 @@ body.dark-mode .pic-item { border-color: var(--border); }
 
           <div class="card">
             <div class="card-header">
-              <div class="card-title">Top 10 PIC (Sepanjang Masa)</div>
+              <div class="card-title">Top 10 Donatur (Sepanjang Masa)</div>
             </div>
             <div class="card-body" style="padding: 20px;">
               <div id="topPicContainer" class="pic-list">
@@ -335,6 +342,8 @@ body.dark-mode .pic-item { border-color: var(--border); }
         <div class="card-body" style="padding: 32px;">
           <div class="form-grid">
             
+            <div class="fg-full form-section-title">✨ Informasi Jurnal</div>
+            
             <div class="fg fg-half">
               <label class="flabel">Kategori Jurnal <span class="text-danger">*</span></label>
               <select class="fselect" id="inTipe" onchange="generateAutoFields()">
@@ -347,7 +356,7 @@ body.dark-mode .pic-item { border-color: var(--border); }
             <div class="fg"><label class="flabel">No Urut Jurnal</label><input class="finput" id="inNo" readonly></div>
             <div class="fg"><label class="flabel">Tanggal Transaksi <span class="text-danger">*</span></label><input class="finput" type="date" id="inTanggal" onchange="updateBulan()"></div>
             
-            <div class="fg-full"><hr style="border: none; border-top: 1px solid var(--border); margin: 8px 0;"></div>
+            <div class="fg-full form-section-title" style="margin-top: 24px;">📝 Detail Utama</div>
 
             <div class="fg fg-half"><label class="flabel">Deskripsi Utama <span class="text-danger">*</span></label><input class="finput" id="inKet1" placeholder="Misal: Gaji Karyawan / Biaya Server..." autocomplete="off"></div>
             <div class="fg fg-half">
@@ -358,13 +367,15 @@ body.dark-mode .pic-item { border-color: var(--border); }
             <div class="fg"><label class="flabel">Periode</label><input class="finput" id="inBulan" readonly></div>
             <div class="fg"><label class="flabel">ID Pin</label><input class="finput" id="inPin" type="number" placeholder="Auto" readonly></div>
             
-            <div class="fg fg-half"><label class="flabel" id="lblNominal">Nominal Transaksi (Rp) <span class="text-danger">*</span></label><input class="finput" id="inNominal" type="text" placeholder="150.000" autocomplete="off" oninput="formatRupiah(this)" style="font-size: 22px; font-weight: 700; font-family: var(--mono); color: var(--blue);"></div>
+            <div class="fg-full form-section-title" style="margin-top: 24px;">💰 Nominal & Person In Charge</div>
+
+            <div class="fg fg-half"><label class="flabel" id="lblNominal">Nominal Transaksi (Rp) <span class="text-danger">*</span></label><input class="finput" id="inNominal" type="text" placeholder="150.000" autocomplete="off" oninput="formatRupiah(this)" style="font-size: 24px; font-weight: 800; font-family: var(--mono); color: var(--blue); letter-spacing: -1px;"></div>
 
             <div class="fg fg-half"><label class="flabel">Person in Charge (PIC)</label><input class="finput" id="inPic" placeholder="Sangat penting untuk hutang/donatur" autocomplete="off"></div>
             <div class="fg-full"><label class="flabel">Catatan Tambahan</label><input class="finput" id="inKet2" placeholder="Opsional" autocomplete="off"></div>
           </div>
           
-          <div style="margin-top: 40px;"><button class="btn btn-primary btn-full" onclick="saveData()">Posting ke Buku Besar</button></div>
+          <div style="margin-top: 48px;"><button class="btn btn-primary btn-full" onclick="saveData()">🚀 Posting ke Buku Besar</button></div>
         </div>
       </div>
 
@@ -532,7 +543,7 @@ function fetchDashboardData() {
 
   const formatBulan = new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric' }).format(new Date());
   const formatBulanOnly = new Intl.DateTimeFormat('id-ID', { month: 'long' }).format(new Date());
-  document.getElementById('titleBulanIni').textContent = 'Top PIC (' + formatBulan + ')';
+  document.getElementById('titleBulanIni').textContent = 'Top Donatur (' + formatBulan + ')';
   document.getElementById('lblBulanIn').textContent = 'PEMASUKAN (' + formatBulanOnly.toUpperCase() + ')';
   document.getElementById('lblBulanOut').textContent = 'PENGELUARAN (' + formatBulanOnly.toUpperCase() + ')';
 

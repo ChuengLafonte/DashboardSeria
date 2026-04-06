@@ -84,7 +84,10 @@ function getDashboardSummary() {
     }
 
     let pic = debitData[i][7] ? String(debitData[i][7]).trim() : '-';
-    if(pic !== "" && pic !== "-") {
+    let picUpper = pic.toUpperCase();
+    let isExcluded = picUpper.includes('CHUENG') || picUpper.includes('UBUR') || picUpper.includes('ADIP');
+
+    if(pic !== "" && pic !== "-" && !isExcluded) {
       topPicsMap[pic] = (topPicsMap[pic] || 0) + nom; 
       if(mData && mData.mm === currentM && mData.yyyy === currentY) {
         topPicsMonthlyMap[pic] = (topPicsMonthlyMap[pic] || 0) + nom;
