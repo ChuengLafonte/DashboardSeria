@@ -59,7 +59,7 @@ function getDashboardSummary() {
   
   let debitTotal = 0, pinjamanTotal = 0, kreditOperasional = 0, kreditBayarHutang = 0;
   let currentMonthIncome = 0, currentMonthExpense = 0; 
-  let topPicsMap = {}, topPicsMonthlyMap = {}, hutangMap = {}; 
+  let topPicsMap = {}, topPicsMonthlyMap = {}, hutangMap = {}, opexMap = {}; 
   
   let monthlyMap = {}; 
   let monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
@@ -112,6 +112,9 @@ function getDashboardSummary() {
       }
     } else { 
       kreditOperasional += nom; 
+      let kodeAkun = kreditData[i][5] ? String(kreditData[i][5]).trim() : "Lainnya";
+      opexMap[kodeAkun] = (opexMap[kodeAkun] || 0) + nom;
+      
       if(mData) {
         if(mData.yyyy === currentY) monthlyMap[mData.mm].expense += nom;
         
@@ -144,6 +147,10 @@ function getDashboardSummary() {
   // Murni Cash Flow: Hanya Uang yang riil masuk (Debit) dikurangi Uang Keluar (Kredit)
   let totalKreditAllTime = kreditOperasional + kreditBayarHutang;
   let saldoKasSaatIni = debitTotal - totalKreditAllTime;
+  
+  let sisaHutangTotal = pinjamanTotal - kreditBayarHutang;
+  let currentRatio = sisaHutangTotal > 0 ? (saldoKasSaatIni / sisaHutangTotal) : (saldoKasSaatIni > 0 ? 999 : 0);
+  let opexBreakdown = Object.keys(opexMap).map(k => ({ label: k, total: opexMap[k] })).sort((a, b) => b.total - a.total);
 
   let topPics = Object.keys(topPicsMap).map(k => ({pic: k, total: topPicsMap[k]})).sort((a, b) => b.total - a.total);
   let topPicsMonthly = Object.keys(topPicsMonthlyMap).map(k => ({pic: k, total: topPicsMonthlyMap[k]})).sort((a, b) => b.total - a.total);
@@ -166,7 +173,9 @@ function getDashboardSummary() {
     labaKotor: debitTotal,
     totalPengeluaran: totalKreditAllTime, // Di-passing ke Frontend
     labaBersih: debitTotal - kreditOperasional,
-    sisaHutang: pinjamanTotal - kreditBayarHutang,
+    sisaHutang: sisaHutangTotal,
+    currentRatio: currentRatio,
+    opexBreakdown: opexBreakdown,
     topPics: topPics.slice(0, 10),
     topPicsMonthly: topPicsMonthly.slice(0, 10),
     debtTracker: debtTracker,

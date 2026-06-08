@@ -75,7 +75,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 @media(min-width: 768px) { .kpi-grid-top { grid-template-columns: 1.5fr 1fr 1fr; gap: 20px; } }
 
 .kpi-grid-bot { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media(min-width: 1024px) { .kpi-grid-bot { grid-template-columns: repeat(4, 1fr); gap: 20px; } }
+@media(min-width: 1024px) { .kpi-grid-bot { grid-template-columns: repeat(5, 1fr); gap: 20px; } }
 
 /* === KPI CARDS === */
 .kpi-card { background: var(--surface); border-radius: var(--r); padding: 24px; box-shadow: var(--sh-card); border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; transition: all 0.3s;}
@@ -257,6 +257,12 @@ body.dark-mode .pic-item { border-color: var(--border); }
                 <div class="kpi-lbl">SISA HUTANG AKTIF</div>
               </div>
 
+              <div class="kpi-card">
+                <div class="icon-box ib-blue">⚖️</div>
+                <div class="kpi-num text-blue" id="valCurrentRatio" style="color: var(--blue);">0x</div>
+                <div class="kpi-lbl">LIKUIDITAS (RATIO)</div>
+              </div>
+
             </div>
           </div>
 
@@ -295,6 +301,15 @@ body.dark-mode .pic-item { border-color: var(--border); }
           </div>
 
         </div> <div class="col-side">
+          
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Rincian Pengeluaran (OPEX)</div>
+            </div>
+            <div class="card-body">
+              <div class="chart-container" style="height: 250px;"><canvas id="opexChart"></canvas></div>
+            </div>
+          </div>
           
           <div class="card">
             <div class="card-header">
@@ -401,6 +416,19 @@ body.dark-mode .pic-item { border-color: var(--border); }
 // --- VARIABEL GLOBAL GRAFIK ---
 let myMonthlyChart = null;
 let myYearlyChart = null;
+let myOpexChart = null;
+
+function generateColors(count) {
+  const isDark = document.body.classList.contains('dark-mode');
+  const s = isDark ? 60 : 70;
+  const l = isDark ? 60 : 55;
+  let colors = [];
+  for(let i=0; i<count; i++) {
+    let h = Math.floor((360 / count) * i);
+    colors.push(`hsl(${h}, ${s}%, ${l}%)`);
+  }
+  return colors;
+}
 
 // --- FITUR DARK MODE ---
 function initTheme() {
@@ -433,6 +461,10 @@ function updateChartColors(isDark) {
      myYearlyChart.options.scales.x.grid.color = gridColor;
      myYearlyChart.options.scales.y.grid.color = gridColor;
      myYearlyChart.update();
+  }
+  if(myOpexChart) {
+     myOpexChart.options.datasets[0].borderColor = isDark ? '#1F2937' : '#FFFFFF';
+     myOpexChart.update();
   }
 }
 
@@ -537,6 +569,46 @@ function renderYearlyChart(chartData) {
   });
 }
 
+function renderOpexChart(data) {
+  const ctx = document.getElementById('opexChart').getContext('2d');
+  if (myOpexChart) myOpexChart.destroy();
+  
+  if(!data || data.length === 0) return;
+
+  const labels = data.map(d => d.label);
+  const values = data.map(d => d.total);
+  const colors = generateColors(data.length);
+  const isDark = document.body.classList.contains('dark-mode');
+  Chart.defaults.color = isDark ? '#9CA3AF' : '#6B7280';
+  
+  myOpexChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: values,
+        backgroundColor: colors,
+        borderWidth: isDark ? 2 : 1,
+        borderColor: isDark ? '#1F2937' : '#FFFFFF',
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, padding: 15 } },
+        tooltip: {
+          callbacks: {
+            label: function(context) { return ' ' + context.label + ': Rp ' + context.raw.toLocaleString('id-ID'); }
+          }
+        }
+      },
+      cutout: '70%',
+      animation: { animateScale: true, animateRotate: true }
+    }
+  });
+}
+
 // --- FETCH DASHBOARD DATA ---
 function fetchDashboardData() {
   showL('Sinkronisasi Data Real-Time...');
@@ -579,6 +651,12 @@ function fetchDashboardData() {
       document.getElementById('valLabaKotor').textContent = formatRp(res.labaKotor);
       document.getElementById('valPengeluaranTotal').textContent = formatRp(res.totalPengeluaran);
       document.getElementById('valSisaHutang').textContent = formatRp(res.sisaHutang);
+      
+      let crText = "0x";
+      if(res.currentRatio === 999) crText = "∞";
+      else crText = res.currentRatio.toFixed(2) + "x";
+      document.getElementById('valCurrentRatio').textContent = crText;
+      
       document.getElementById('titleTahunIni').textContent = res.currentYear;
 
       // Top PIC ALL TIME
@@ -628,6 +706,7 @@ function fetchDashboardData() {
       // RENDER GRAFIK
       if(res.monthlyChart && res.monthlyChart.length > 0) renderMonthlyChart(res.monthlyChart);
       if(res.yearlyChart && res.yearlyChart.length > 0) renderYearlyChart(res.yearlyChart);
+      if(res.opexBreakdown && res.opexBreakdown.length > 0) renderOpexChart(res.opexBreakdown);
     })
     .withFailureHandler(function(err) { hideL(); toast('Koneksi Terputus!'); })
     .getDashboardSummary();
@@ -694,9 +773,7 @@ const akunMap = {
     { kode: "Pembayaran Hutang", pin: 10 } 
   ],
   "Debit": [
-    { kode: "MMORPG", pin: 5 }, 
-    { kode: "Caveblock", pin: 6 },
-    { kode: "Survival", pin: 7 },
+    { kode: "TopUp", pin: 5 }, 
     { kode: "Saldo", pin: 8 }
   ],
   "Pinjaman": [
